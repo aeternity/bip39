@@ -3,9 +3,6 @@ var createHash = require('create-hash')
 var pbkdf2 = require('pbkdf2').pbkdf2Sync
 var randomBytes = require('randombytes')
 
-// use unorm until String.prototype.normalize gets better browser support
-var unorm = require('unorm')
-
 var ENGLISH_WORDLIST = require('./wordlists/english.json')
 var DEFAULT_WORDLIST = ENGLISH_WORDLIST
 
@@ -40,9 +37,16 @@ function salt (password) {
   return 'mnemonic' + (password || '')
 }
 
+function normalizeString (str) {
+  if (typeof str.normalize === 'function') {
+    return str.normalize('NFKD')
+  }
+  return str
+}
+
 function mnemonicToSeed (mnemonic, password) {
-  var mnemonicBuffer = Buffer.from(unorm.nfkd(mnemonic), 'utf8')
-  var saltBuffer = Buffer.from(salt(unorm.nfkd(password)), 'utf8')
+  var mnemonicBuffer = Buffer.from(normalizeString(mnemonic), 'utf8')
+  var saltBuffer = Buffer.from(normalizeString(salt(password)), 'utf8')
 
   return pbkdf2(mnemonicBuffer, saltBuffer, 2048, 64, 'sha512')
 }
@@ -54,7 +58,7 @@ function mnemonicToSeedHex (mnemonic, password) {
 function mnemonicToEntropy (mnemonic, wordlist) {
   wordlist = wordlist || DEFAULT_WORDLIST
 
-  var words = unorm.nfkd(mnemonic).split(' ')
+  var words = normalizeString(mnemonic).split(' ')
   if (words.length % 3 !== 0) throw new Error(INVALID_MNEMONIC)
 
   // convert word indices to 11 bit binary strings
