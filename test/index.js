@@ -3,7 +3,6 @@ var Buffer = require('safe-buffer').Buffer
 var download = require('../util/wordlists').download
 var WORDLISTS = {
   english: require('../wordlists/english.json'),
-  japanese: require('../wordlists/japanese.json'),
   custom: require('./wordlist.json')
 }
 
@@ -29,7 +28,6 @@ function testVector (description, wordlist, password, v, i) {
 }
 
 vectors.english.forEach(function (v, i) { testVector('English', undefined, 'TREZOR', v, i) })
-vectors.japanese.forEach(function (v, i) { testVector('Japanese', WORDLISTS.japanese, '㍍ガバヴァぱばぐゞちぢ十人十色', v, i) })
 vectors.custom.forEach(function (v, i) { testVector('Custom', WORDLISTS.custom, undefined, v, i) })
 
 test('invalid entropy', function (t) {
@@ -46,21 +44,6 @@ test('invalid entropy', function (t) {
   t.throws(function () {
     bip39.entropyToMnemonic(Buffer.from(new Array(1028 + 1).join('00'), 'hex'))
   }, /^TypeError: Invalid entropy$/, 'throws for entropy that is larger than 1024')
-})
-
-test('UTF8 passwords', function (t) {
-  t.plan(vectors.japanese.length * 2)
-
-  vectors.japanese.forEach(function (v) {
-    var vmnemonic = v[1]
-    var vseedHex = v[2]
-
-    var password = '㍍ガバヴァぱばぐゞちぢ十人十色'
-    var normalizedPassword = 'メートルガバヴァぱばぐゞちぢ十人十色'
-
-    t.equal(bip39.mnemonicToSeedHex(vmnemonic, password), vseedHex, 'mnemonicToSeedHex normalizes passwords')
-    t.equal(bip39.mnemonicToSeedHex(vmnemonic, normalizedPassword), vseedHex, 'mnemonicToSeedHex leaves normalizes passwords as-is')
-  })
 })
 
 test('generateMnemonic can vary entropy length', function (t) {

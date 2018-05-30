@@ -9,7 +9,6 @@ var WORDLISTS = [
   'english',
   'french',
   'italian',
-  'japanese',
   'spanish',
   'korean'
 ]
