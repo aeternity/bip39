@@ -2,7 +2,13 @@ var bip39 = require('../')
 var Buffer = require('safe-buffer').Buffer
 var download = require('../util/wordlists').download
 var WORDLISTS = {
+  chinese_simplified: require('../wordlists/chinese_simplified.json'),
+  chinese_traditional: require('../wordlists/chinese_traditional.json'),
   english: require('../wordlists/english.json'),
+  french: require('../wordlists/french.json'),
+  italian: require('../wordlists/italian.json'),
+  spanish: require('../wordlists/spanish.json'),
+  korean: require('../wordlists/korean.json'),
   custom: require('./wordlist.json')
 }
 
@@ -81,7 +87,7 @@ test('exposes standard wordlists', function (t) {
 test('verify wordlists from https://github.com/bitcoin/bips/blob/master/bip-0039/bip-0039-wordlists.md', function (t) {
   download().then(function (wordlists) {
     Object.keys(wordlists).forEach(function (name) {
-      t.same(bip39.wordlists[name], wordlists[name])
+      t.same(WORDLISTS[name], wordlists[name])
     })
 
     t.end()
